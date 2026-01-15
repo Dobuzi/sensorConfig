@@ -58,7 +58,8 @@ const validateSettings = (settings: any) => {
     isNumber(settings.lidarPointCount) &&
     isNumber(settings.coverageSampleCount) &&
     typeof settings.showCoverageHeatmap === "boolean" &&
-    (typeof settings.compactMode === "boolean" || typeof settings.compactMode === "undefined");
+    (typeof settings.compactMode === "boolean" || typeof settings.compactMode === "undefined") &&
+    (settings.vehicleDetail === "low" || settings.vehicleDetail === "high" || typeof settings.vehicleDetail === "undefined");
 };
 
 const validateScenarios = (scenarios: any) => {

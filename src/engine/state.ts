@@ -49,7 +49,8 @@ const baseSettings: UiSettings = {
   lidarPointCount: 5000,
   coverageSampleCount: 2000,
   showCoverageHeatmap: false,
-  compactMode: true
+  compactMode: true,
+  vehicleDetail: "high"
 };
 
 const baseScenarios: ScenarioState = {

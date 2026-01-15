@@ -66,6 +66,7 @@ export type UiSettings = {
   coverageSampleCount: number;
   showCoverageHeatmap: boolean;
   compactMode: boolean;
+  vehicleDetail: "low" | "high";
 };
 
 export type VendorSelection = {

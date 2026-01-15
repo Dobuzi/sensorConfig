@@ -23,6 +23,7 @@ type SceneViewProps = {
   performanceMode: boolean;
   lidarPointCount: number;
   showLidarPoints: boolean;
+  vehicleDetail: "low" | "high";
   coverage?: CoverageResult;
   resetKey?: number;
   onSelect: (id: string | null) => void;
@@ -67,6 +68,7 @@ export const SceneView = ({
   performanceMode,
   lidarPointCount,
   showLidarPoints,
+  vehicleDetail,
   coverage,
   resetKey = 0,
   onSelect,
@@ -158,6 +160,7 @@ export const SceneView = ({
           onSensorPointerDown={handleSensorPointerDown}
           showLidarPoints={showLidarPoints}
           lidarPointCount={lidarPointCount}
+          vehicleDetail={vehicleDetail}
         />
         {isEditableView && (
           <mesh

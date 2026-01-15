@@ -19,6 +19,20 @@ body {
   min-height: 100vh;
 }
 
+.app.touch button,
+.app.touch select,
+.app.touch input,
+.app.touch summary {
+  min-height: 44px;
+}
+
+.app.touch .panel input,
+.app.touch .panel select,
+.app.touch .panel textarea {
+  padding: 10px 12px;
+  font-size: 13px;
+}
+
 .header {
   display: flex;
   justify-content: space-between;
@@ -54,6 +68,12 @@ body {
   font-size: 12px;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .layout {
   flex: 1;
   display: grid;
@@ -66,6 +86,27 @@ body {
   grid-template-columns: 210px minmax(0, 1fr) 280px;
   gap: 12px;
   padding: 12px 16px 20px;
+}
+
+.layout.tablet {
+  grid-template-columns: 240px minmax(0, 1fr);
+}
+
+.layout.tablet.compact {
+  grid-template-columns: 210px minmax(0, 1fr);
+}
+
+.layout.tablet[data-sidebar-open="false"] {
+  grid-template-columns: 0 minmax(0, 1fr);
+}
+
+.layout.tablet.compact[data-sidebar-open="false"] {
+  grid-template-columns: 0 minmax(0, 1fr);
+}
+
+.layout.phone {
+  grid-template-columns: 1fr;
+  padding: 10px 10px 90px;
 }
 
 .panel {
@@ -81,6 +122,15 @@ body {
 .panel.compact {
   padding: 10px;
   gap: 10px;
+}
+
+.panel.left.collapsed {
+  max-width: 0;
+  padding: 0;
+  border: none;
+  opacity: 0;
+  pointer-events: none;
+  overflow: hidden;
 }
 
 .panel.compact details {
@@ -264,9 +314,28 @@ button:disabled {
   min-height: 200px;
 }
 
+.layout.tablet .scene-view {
+  min-height: 360px;
+}
+
+.layout.tablet .scene-view.top,
+.layout.tablet .scene-view.side {
+  min-height: 200px;
+}
+
+.layout.phone .scene-view,
+.layout.phone .scene-view.top,
+.layout.phone .scene-view.side {
+  min-height: 55vh;
+}
+
 .scene-view canvas {
   width: 100%;
   height: 100%;
+}
+
+.scene-view canvas {
+  touch-action: none;
 }
 
 .view-label {
@@ -337,6 +406,86 @@ button:disabled {
   flex-wrap: wrap;
   gap: 10px;
   font-size: 12px;
+}
+
+.viewport.tablet .aux-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.viewport.phone {
+  position: relative;
+  gap: 8px;
+}
+
+.view-tabs {
+  display: inline-flex;
+  background: rgba(15, 23, 42, 0.85);
+  border-radius: 999px;
+  padding: 4px;
+  gap: 4px;
+  align-self: center;
+}
+
+.view-tabs button {
+  background: transparent;
+  color: #f8fafc;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+}
+
+.view-tabs button.active {
+  background: #0ea5e9;
+  color: #fff;
+}
+
+.phone-view-stack {
+  position: relative;
+}
+
+.phone-view {
+  display: none;
+}
+
+.phone-view.active {
+  display: block;
+}
+
+.bottom-sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.96);
+  border-top: 1px solid rgba(148, 163, 184, 0.4);
+  box-shadow: 0 -10px 24px rgba(15, 23, 42, 0.12);
+  display: grid;
+  grid-template-rows: auto 0fr;
+  transition: grid-template-rows 0.2s ease;
+  z-index: 10;
+}
+
+.bottom-sheet.open {
+  grid-template-rows: auto 1fr;
+}
+
+.sheet-handle {
+  border: none;
+  background: #0f172a;
+  color: #f8fafc;
+  padding: 10px 12px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.bottom-sheet-content {
+  overflow: hidden;
+  max-height: 60vh;
+  padding: 10px 12px 16px;
+  display: grid;
+  gap: 12px;
 }
 
 .aux-views {

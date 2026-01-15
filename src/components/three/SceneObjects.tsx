@@ -99,7 +99,8 @@ export const SceneObjects = ({
   scenarios,
   onSensorPointerDown,
   showLidarPoints,
-  lidarPointCount
+  lidarPointCount,
+  vehicleDetail
 }: {
   vehicle: VehicleTemplate;
   sensors: Sensor[];
@@ -108,12 +109,13 @@ export const SceneObjects = ({
   onSensorPointerDown?: (sensor: Sensor) => void;
   showLidarPoints: boolean;
   lidarPointCount: number;
+  vehicleDetail: "low" | "high";
 }) => {
   const overlaps = useMemo(() => detectOverlaps(sensors), [sensors]);
 
   return (
     <group>
-      <VehicleModel3D vehicle={vehicle} />
+      <VehicleModel3D vehicle={vehicle} detailLevel={vehicleDetail} />
       {sensors
         .filter((sensor) => sensor.enabled && layers[sensor.type])
         .map((sensor) => (
