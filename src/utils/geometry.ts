@@ -50,7 +50,7 @@ export const wedgeTriangle = (origin: Vec2, yawDeg: number, fovDeg: number, rang
   const yaw = degToRad(yawDeg);
   const left = { x: origin.x + range * Math.cos(yaw + half), y: origin.y + range * Math.sin(yaw + half) };
   const right = { x: origin.x + range * Math.cos(yaw - half), y: origin.y + range * Math.sin(yaw - half) };
-  return [origin, left, right];
+  return [origin, right, left];
 };
 
 const polygonArea = (poly: Vec2[]) => {

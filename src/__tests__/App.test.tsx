@@ -3,7 +3,8 @@ import { describe, expect, it } from "vitest";
 import { App } from "../App";
 
 const click = (label: RegExp) => {
-  fireEvent.click(screen.getByRole("button", { name: label }));
+  const buttons = screen.getAllByRole("button", { name: label });
+  fireEvent.click(buttons[0]);
 };
 
 describe("App interactions", () => {

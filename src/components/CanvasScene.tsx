@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Layers, Sensor, VehicleTemplate } from "../models/types";
 import { detectOverlaps } from "../engine/overlap";
-import { degToRad } from "../utils/geometry";
+import { degToRad, wedgeTriangle } from "../utils/geometry";
 
 const SENSOR_COLORS: Record<string, string> = {
   camera: "#1f77b4",
@@ -61,11 +61,31 @@ export const CanvasScene = ({
     ctx.fill();
     ctx.stroke();
 
+    const frontX = vehicle.dimensions.length / 2 + 0.15;
+    ctx.fillStyle = "#111827";
+    ctx.beginPath();
+    ctx.moveTo(frontX, 0);
+    ctx.lineTo(frontX - 0.2, 0.12);
+    ctx.lineTo(frontX - 0.2, -0.12);
+    ctx.closePath();
+    ctx.fill();
+    ctx.save();
+    ctx.scale(1, -1);
+    ctx.fillStyle = "#111827";
+    ctx.font = `${12 / zoom}px sans-serif`;
+    ctx.fillText("FRONT", frontX - 0.05, -0.2);
+    ctx.restore();
+
     visibleSensors.forEach((sensor) => {
       const { x, y } = sensor.pose.position;
       const yaw = degToRad(sensor.pose.orientation.yawDeg);
       const range = sensor.rangeM;
-      const half = degToRad(sensor.fov.horizontalDeg / 2);
+      const [origin, right, left] = wedgeTriangle(
+        { x, y },
+        sensor.pose.orientation.yawDeg,
+        sensor.fov.horizontalDeg,
+        range
+      );
       const color = SENSOR_COLORS[sensor.type];
 
       ctx.fillStyle = color;
@@ -76,9 +96,9 @@ export const CanvasScene = ({
 
       ctx.globalAlpha = 0.15;
       ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.lineTo(x + range * Math.cos(yaw + half), y + range * Math.sin(yaw + half));
-      ctx.lineTo(x + range * Math.cos(yaw - half), y + range * Math.sin(yaw - half));
+      ctx.moveTo(origin.x, origin.y);
+      ctx.lineTo(left.x, left.y);
+      ctx.lineTo(right.x, right.y);
       ctx.closePath();
       ctx.fill();
       ctx.globalAlpha = 1;
