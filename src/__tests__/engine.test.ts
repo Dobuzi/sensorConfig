@@ -37,6 +37,7 @@ describe("constraint solver", () => {
       id: "outside",
       type: "camera" as const,
       label: "Outside",
+      specCategory: "main",
       pose: {
         position: { x: 10, y: 10, z: 1 },
         orientation: { yawDeg: 0, pitchDeg: 0, rollDeg: 0 }
@@ -55,6 +56,7 @@ describe("constraint solver", () => {
       id: "a",
       type: "radar" as const,
       label: "A",
+      specCategory: "mrr",
       pose: {
         position: { x: 0, y: 0, z: 0.6 },
         orientation: { yawDeg: 0, pitchDeg: 0, rollDeg: 0 }
@@ -76,6 +78,7 @@ describe("constraint solver", () => {
       id: "left",
       type: "camera" as const,
       label: "Left",
+      specCategory: "wide",
       pose: {
         position: { x: 0, y: 0.5, z: 1.3 },
         orientation: { yawDeg: 30, pitchDeg: 0, rollDeg: 0 }
@@ -97,6 +100,7 @@ describe("constraint solver", () => {
       id: "left",
       type: "camera" as const,
       label: "Left",
+      specCategory: "wide",
       pose: {
         position: { x: 0.2, y: 0.4, z: 1.3 },
         orientation: { yawDeg: 10, pitchDeg: 0, rollDeg: 0 }
@@ -120,6 +124,7 @@ describe("overlap detection", () => {
         id: "a",
         type: "camera" as const,
         label: "A",
+        specCategory: "main",
         pose: {
           position: { x: 0, y: 0, z: 1 },
           orientation: { yawDeg: 0, pitchDeg: 0, rollDeg: 0 }
@@ -132,6 +137,7 @@ describe("overlap detection", () => {
         id: "b",
         type: "camera" as const,
         label: "B",
+        specCategory: "main",
         pose: {
           position: { x: 0.1, y: 0, z: 1 },
           orientation: { yawDeg: 5, pitchDeg: 0, rollDeg: 0 }
@@ -151,6 +157,7 @@ describe("overlap detection", () => {
         id: "wide",
         type: "camera" as const,
         label: "Wide",
+        specCategory: "wide",
         pose: {
           position: { x: 0, y: 0, z: 1 },
           orientation: { yawDeg: 0, pitchDeg: 0, rollDeg: 0 }
@@ -163,6 +170,7 @@ describe("overlap detection", () => {
         id: "wide-2",
         type: "camera" as const,
         label: "Wide 2",
+        specCategory: "wide",
         pose: {
           position: { x: 0.2, y: 0, z: 1 },
           orientation: { yawDeg: 5, pitchDeg: 0, rollDeg: 0 }

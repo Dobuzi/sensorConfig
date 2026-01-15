@@ -14,6 +14,7 @@ const makeSensor = (type: Sensor["type"], yaw: number, fov: number) => ({
   id: `${type}-1`,
   type,
   label: "S",
+  specCategory: type === "radar" ? "mrr" : type === "lidar" ? "long" : "main",
   pose: {
     position: { x: 0, y: 0, z: 1 },
     orientation: { yawDeg: yaw, pitchDeg: 0, rollDeg: 0 }

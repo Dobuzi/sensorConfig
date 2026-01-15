@@ -52,7 +52,7 @@ const validateLayers = (layers: any) => {
 };
 
 const validateSettings = (settings: any) => {
-  return settings &&
+  return !settings || settings &&
     typeof settings.enableViewEditing === "boolean" &&
     typeof settings.performanceMode === "boolean" &&
     isNumber(settings.lidarPointCount) &&
@@ -61,7 +61,7 @@ const validateSettings = (settings: any) => {
 };
 
 const validateScenarios = (scenarios: any) => {
-  return scenarios &&
+  return !scenarios || scenarios &&
     scenarios.pedestrian &&
     typeof scenarios.pedestrian.enabled === "boolean" &&
     isNumber(scenarios.pedestrian.crossingDistanceM) &&
@@ -72,6 +72,14 @@ const validateScenarios = (scenarios: any) => {
     isNumber(scenarios.intersection.speedMps);
 };
 
+const validateVendors = (vendors: any) => {
+  return !vendors || vendors &&
+    typeof vendors.camera === "string" &&
+    typeof vendors.radar === "string" &&
+    typeof vendors.ultrasonic === "string" &&
+    typeof vendors.lidar === "string";
+};
+
 export const exportState = (state: AppState): ExportState => ({
   schemaVersion: state.schemaVersion,
   meta: state.meta,
@@ -80,6 +88,7 @@ export const exportState = (state: AppState): ExportState => ({
   layers: state.layers,
   settings: state.settings,
   scenarios: state.scenarios,
+  vendors: state.vendors,
   sensors: state.sensors
 });
 
@@ -103,6 +112,9 @@ export const importState = (raw: string) => {
     }
     if (!validateScenarios(parsed.scenarios)) {
       return { ok: false, error: "Invalid scenarios data." } as const;
+    }
+    if (!validateVendors(parsed.vendors)) {
+      return { ok: false, error: "Invalid vendor data." } as const;
     }
     if (!Array.isArray(parsed.sensors) || !parsed.sensors.every(validateSensor)) {
       return { ok: false, error: "Invalid sensor data." } as const;

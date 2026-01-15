@@ -5,6 +5,7 @@ Frontend-only React + TypeScript app running in the browser. No backend or exter
 
 ## Major Modules
 - Data model & schema: typed sensor/vehicle/constraint models and JSON schema validation.
+- Sensor spec registry: centralized vendor/module specs with categories per sensor type in `src/specs/` and documented in `docs/sensor_specs_sources.md`.
 - Recommendation engine: deterministic placement rules based on vehicle length/width anchors.
 - Constraint solver: boundary clamp, min-spacing separation, mirror placement.
 - Renderer (3D scene): Three.js scene with extruded vehicle mesh, sensors, and frustums.
@@ -29,6 +30,7 @@ React Three Fiber + Three.js. The same scene graph is rendered in three canvases
 - Side view (orthographic camera, locked)
 
 Top/Side views add world-aligned grid lines, angular rays, and optional coverage heatmap.
+Vendor selection updates fov/range/point density via the spec registry and re-renders all views. Presets declare default vendors, while user selection overrides them globally per sensor type.
 
 ## Testing Strategy
 - Unit tests for geometry, constraints, and recommendation engine.

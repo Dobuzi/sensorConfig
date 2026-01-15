@@ -7,6 +7,7 @@ A production-ready MVP for designing autonomous-driving sensor configurations wi
 - Scenario overlays (pedestrian crossing, intersection) with coverage checks
 - Vehicle templates: sedan, hatchback, SUV
 - Deterministic presets (Tesla FSD, NCAP, Robotaxi)
+- Vendor-based sensor specs with selectable modules
 - Constraint enforcement: boundary clamp, min spacing, mirror placement
 - FOV frustums, overlap highlights, and layer toggles
 - Coverage metrics and optional heatmap overlay
@@ -54,3 +55,6 @@ GITHUB_REPO_NAME=sensorConfig npm run build
 
 ## JSON Schema (3D-ready)
 See `docs/requirements.md` for the full schema definition and acceptance criteria.
+
+## Sensor Spec Sources
+See `docs/sensor_specs_sources.md` for vendor/module references and notes.

@@ -71,7 +71,15 @@ const SensorMesh = ({
         <lineBasicMaterial color={SENSOR_COLORS[sensor.type]} transparent opacity={0.5} />
       </line>
       {sensor.type === "lidar" && showLidarPoints && (
-        <LidarPointCloud sensor={sensor} pointCount={lidarPointCount} />
+        <LidarPointCloud
+          sensor={sensor}
+          pointCount={Math.max(
+            500,
+            Math.round(
+              lidarPointCount * (sensor.specPointRateKpps ? sensor.specPointRateKpps / 200 : 1)
+            )
+          )}
+        />
       )}
     </group>
   );

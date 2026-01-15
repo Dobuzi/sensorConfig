@@ -4,10 +4,11 @@ import { computeCoverage, scenarioCovered } from "./engine/coverage";
 import { scenarioMarkers } from "./engine/scenarios";
 import { exportState, importState } from "./engine/serialization";
 import { detectOverlaps } from "./engine/overlap";
-import { PresetId, presetSensors } from "./engine/presets";
+import { PresetId, presetSensors, presetVendors } from "./engine/presets";
 import { createInitialState, reducer } from "./engine/state";
 import { VEHICLES } from "./models/vehicles";
 import { Sensor } from "./models/types";
+import { vendorOptions } from "./specs/sensorVendors";
 
 const presetOptions: { id: PresetId; label: string; sublabel: string }[] = [
   { id: "tesla-fsd", label: "Tesla FSD", sublabel: "8 cameras (approx)" },
@@ -73,6 +74,10 @@ export const App = () => {
     () => state.sensors.filter((sensor) => sensor.enabled && state.layers[sensor.type]),
     [state.sensors, state.layers]
   );
+  const cameraVendors = useMemo(() => vendorOptions("camera"), []);
+  const radarVendors = useMemo(() => vendorOptions("radar"), []);
+  const ultrasonicVendors = useMemo(() => vendorOptions("ultrasonic"), []);
+  const lidarVendors = useMemo(() => vendorOptions("lidar"), []);
 
   return (
     <div className="app">
@@ -175,6 +180,82 @@ export const App = () => {
                   {layer}
                 </label>
               ))}
+            </div>
+          </details>
+          <details open>
+            <summary>Sensor Vendors</summary>
+            <div className="vendor-grid">
+              <label>
+                Camera Vendor
+                <select
+                  value={state.vendors.camera}
+                  onChange={(event) =>
+                    dispatch({ type: "setVendors", vendors: { ...state.vendors, camera: event.target.value } })
+                  }
+                >
+                  {cameraVendors.map((vendor) => (
+                    <option key={vendor.vendorId} value={vendor.vendorId}>
+                      {vendor.vendorName}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Radar Vendor
+                <select
+                  value={state.vendors.radar}
+                  onChange={(event) =>
+                    dispatch({ type: "setVendors", vendors: { ...state.vendors, radar: event.target.value } })
+                  }
+                >
+                  {radarVendors.map((vendor) => (
+                    <option key={vendor.vendorId} value={vendor.vendorId}>
+                      {vendor.vendorName}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Ultrasonic Vendor
+                <select
+                  value={state.vendors.ultrasonic}
+                  onChange={(event) =>
+                    dispatch({
+                      type: "setVendors",
+                      vendors: { ...state.vendors, ultrasonic: event.target.value }
+                    })
+                  }
+                >
+                  {ultrasonicVendors.map((vendor) => (
+                    <option key={vendor.vendorId} value={vendor.vendorId}>
+                      {vendor.vendorName}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                LiDAR Vendor
+                <select
+                  value={state.vendors.lidar}
+                  onChange={(event) =>
+                    dispatch({ type: "setVendors", vendors: { ...state.vendors, lidar: event.target.value } })
+                  }
+                >
+                  {lidarVendors.map((vendor) => (
+                    <option key={vendor.vendorId} value={vendor.vendorId}>
+                      {vendor.vendorName}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <a
+                className="vendor-link"
+                href="https://github.com/Dobuzi/sensorConfig/blob/main/docs/sensor_specs_sources.md"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Spec Sources
+              </a>
             </div>
           </details>
           <details open>
@@ -670,7 +751,11 @@ export const App = () => {
             <button
               onClick={() => {
                 const sensors = presetSensors("tesla-fsd", state.vehicle);
-                dispatch({ type: "importState", state: { ...exportState(state), sensors } });
+                const vendors = presetVendors("tesla-fsd");
+                dispatch({
+                  type: "importState",
+                  state: { ...exportState(state), sensors, vendors }
+                });
               }}
             >
               Reset to Tesla FSD

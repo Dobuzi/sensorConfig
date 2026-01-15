@@ -5,6 +5,7 @@ const baseSensor = {
   id: "s1",
   type: "camera" as const,
   label: "S1",
+  specCategory: "main",
   pose: {
     position: { x: 1, y: 2, z: 0.5 },
     orientation: { yawDeg: 0, pitchDeg: 0, rollDeg: 0 }

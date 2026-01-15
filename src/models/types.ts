@@ -18,6 +18,8 @@ export type Sensor = {
   id: string;
   type: SensorType;
   label: string;
+  specCategory: string;
+  specPointRateKpps?: number;
   pose: SensorPose;
   fov: { horizontalDeg: number; verticalDeg: number | null };
   rangeM: number;
@@ -47,6 +49,7 @@ export type AppState = {
   layers: Layers;
   settings: UiSettings;
   scenarios: ScenarioState;
+  vendors: VendorSelection;
   sensors: Sensor[];
   selectedSensorId: string | null;
   error: string | null;
@@ -62,6 +65,13 @@ export type UiSettings = {
   lidarPointCount: number;
   coverageSampleCount: number;
   showCoverageHeatmap: boolean;
+};
+
+export type VendorSelection = {
+  camera: string;
+  radar: string;
+  ultrasonic: string;
+  lidar: string;
 };
 
 export type ScenarioState = {

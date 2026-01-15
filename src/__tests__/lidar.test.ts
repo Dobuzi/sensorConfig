@@ -6,6 +6,7 @@ const sensor: Sensor = {
   id: "lidar-1",
   type: "lidar",
   label: "Lidar",
+  specCategory: "long",
   pose: {
     position: { x: 0, y: 0, z: 1 },
     orientation: { yawDeg: 0, pitchDeg: 0, rollDeg: 0 }

@@ -108,6 +108,23 @@ summary {
   font-size: 12px;
 }
 
+.vendor-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.vendor-link {
+  font-size: 11px;
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.vendor-link:hover {
+  text-decoration: underline;
+}
+
 .toggle {
   display: flex;
   align-items: center;

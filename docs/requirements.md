@@ -24,6 +24,7 @@ Designers need a fast, visual way to configure autonomous-driving sensors on veh
 - Vehicle templates: sedan, hatchback, SUV (with polygon footprints).
 - Sensor model: position and orientation (yaw/pitch/roll), FOV, range, enabled.
 - Recommendation engine: deterministic placements for three presets.
+- Vendor selection: user-selectable sensor vendor/module per type that updates FOV/range.
 - Constraints: boundary clamp, min spacing (0.1–0.2m), mirror placement.
 - Rendering: 3D vehicle mesh, sensors, FOV frustums, overlap highlight.
 - Multi-view: main 3D view plus locked Top (XY) and Side (XZ) views.

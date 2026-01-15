@@ -7,3 +7,4 @@
 - LiDAR point cloud: deterministic seeded point cloud using Three.js Points.
 - Coverage metrics: ground-plane sampling with per-type and combined coverage% plus optional heatmap.
 - Performance safeguards: performance mode reduces LiDAR point count, coverage samples, and aux view update frequency.
+- Sensor vendor registry: centralized vendor/module specs with UI selection and traceable sources.
