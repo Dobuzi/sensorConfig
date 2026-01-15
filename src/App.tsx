@@ -1,5 +1,7 @@
 import { useMemo, useReducer, useState } from "react";
 import { SceneView } from "./components/SceneView";
+import { computeCoverage, scenarioCovered } from "./engine/coverage";
+import { scenarioMarkers } from "./engine/scenarios";
 import { exportState, importState } from "./engine/serialization";
 import { detectOverlaps } from "./engine/overlap";
 import { PresetId, presetSensors } from "./engine/presets";
@@ -19,6 +21,23 @@ export const App = () => {
 
   const selectedSensor = state.sensors.find((sensor) => sensor.id === state.selectedSensorId) || null;
   const overlaps = useMemo(() => detectOverlaps(state.sensors), [state.sensors]);
+  const effectiveLidarPoints = state.settings.performanceMode
+    ? Math.min(state.settings.lidarPointCount, 2000)
+    : state.settings.lidarPointCount;
+  const effectiveCoverageSamples = state.settings.performanceMode
+    ? Math.min(state.settings.coverageSampleCount, 800)
+    : state.settings.coverageSampleCount;
+  const coverage = useMemo(
+    () => computeCoverage(state.sensors, state.layers, effectiveCoverageSamples),
+    [state.sensors, state.layers, effectiveCoverageSamples]
+  );
+  const markers = useMemo(() => scenarioMarkers(state.scenarios), [state.scenarios]);
+  const pedestrianCovered = state.scenarios.pedestrian.enabled
+    ? scenarioCovered(state.sensors, state.layers, markers.pedestrian)
+    : false;
+  const intersectionCovered = state.scenarios.intersection.enabled
+    ? scenarioCovered(state.sensors, state.layers, markers.intersection)
+    : false;
 
   const handlePreset = (presetId: PresetId) => {
     dispatch({ type: "applyPreset", preset: presetId });
@@ -158,6 +177,204 @@ export const App = () => {
               ))}
             </div>
           </details>
+          <details open>
+            <summary>Editing</summary>
+            <div className="inline-grid">
+              <label className="toggle">
+                <input
+                  type="checkbox"
+                  checked={state.settings.enableViewEditing}
+                  onChange={(event) =>
+                    dispatch({
+                      type: "setSettings",
+                      settings: { ...state.settings, enableViewEditing: event.target.checked }
+                    })
+                  }
+                />
+                Edit Top/Side
+              </label>
+              <label className="toggle">
+                <input
+                  type="checkbox"
+                  checked={state.settings.showCoverageHeatmap}
+                  onChange={(event) =>
+                    dispatch({
+                      type: "setSettings",
+                      settings: { ...state.settings, showCoverageHeatmap: event.target.checked }
+                    })
+                  }
+                />
+                Coverage Heatmap
+              </label>
+            </div>
+          </details>
+          <details open>
+            <summary>Scenarios</summary>
+            <div className="scenario-grid">
+              <label className="toggle">
+                <input
+                  type="checkbox"
+                  checked={state.scenarios.pedestrian.enabled}
+                  onChange={(event) =>
+                    dispatch({
+                      type: "setScenarios",
+                      scenarios: {
+                        ...state.scenarios,
+                        pedestrian: { ...state.scenarios.pedestrian, enabled: event.target.checked }
+                      }
+                    })
+                  }
+                />
+                Pedestrian Crossing
+              </label>
+              <label>
+                Crossing X (m)
+                <input
+                  type="number"
+                  step={1}
+                  value={state.scenarios.pedestrian.crossingDistanceM}
+                  onChange={(event) =>
+                    dispatch({
+                      type: "setScenarios",
+                      scenarios: {
+                        ...state.scenarios,
+                        pedestrian: {
+                          ...state.scenarios.pedestrian,
+                          crossingDistanceM: Number(event.target.value)
+                        }
+                      }
+                    })
+                  }
+                />
+              </label>
+              <label>
+                Ped Speed (m/s)
+                <input
+                  type="number"
+                  step={0.1}
+                  value={state.scenarios.pedestrian.speedMps}
+                  onChange={(event) =>
+                    dispatch({
+                      type: "setScenarios",
+                      scenarios: {
+                        ...state.scenarios,
+                        pedestrian: {
+                          ...state.scenarios.pedestrian,
+                          speedMps: Number(event.target.value)
+                        }
+                      }
+                    })
+                  }
+                />
+              </label>
+              <label className="toggle">
+                <input
+                  type="checkbox"
+                  checked={state.scenarios.intersection.enabled}
+                  onChange={(event) =>
+                    dispatch({
+                      type: "setScenarios",
+                      scenarios: {
+                        ...state.scenarios,
+                        intersection: { ...state.scenarios.intersection, enabled: event.target.checked }
+                      }
+                    })
+                  }
+                />
+                Intersection
+              </label>
+              <label>
+                Intersection X (m)
+                <input
+                  type="number"
+                  step={1}
+                  value={state.scenarios.intersection.centerDistanceM}
+                  onChange={(event) =>
+                    dispatch({
+                      type: "setScenarios",
+                      scenarios: {
+                        ...state.scenarios,
+                        intersection: {
+                          ...state.scenarios.intersection,
+                          centerDistanceM: Number(event.target.value)
+                        }
+                      }
+                    })
+                  }
+                />
+              </label>
+              <label>
+                Cross Speed (m/s)
+                <input
+                  type="number"
+                  step={0.5}
+                  value={state.scenarios.intersection.speedMps}
+                  onChange={(event) =>
+                    dispatch({
+                      type: "setScenarios",
+                      scenarios: {
+                        ...state.scenarios,
+                        intersection: {
+                          ...state.scenarios.intersection,
+                          speedMps: Number(event.target.value)
+                        }
+                      }
+                    })
+                  }
+                />
+              </label>
+            </div>
+          </details>
+          <details open>
+            <summary>Performance</summary>
+            <div className="inline-grid">
+              <label className="toggle">
+                <input
+                  type="checkbox"
+                  checked={state.settings.performanceMode}
+                  onChange={(event) =>
+                    dispatch({
+                      type: "setSettings",
+                      settings: { ...state.settings, performanceMode: event.target.checked }
+                    })
+                  }
+                />
+                Performance Mode
+              </label>
+              <label>
+                LiDAR Points
+                <input
+                  type="number"
+                  min={1000}
+                  max={20000}
+                  step={500}
+                  value={state.settings.lidarPointCount}
+                  onChange={(event) =>
+                    dispatch({
+                      type: "setSettings",
+                      settings: { ...state.settings, lidarPointCount: Number(event.target.value) }
+                    })
+                  }
+                />
+              </label>
+              <label>
+                Coverage Samples
+                <input
+                  type="number"
+                  min={500}
+                  max={5000}
+                  step={250}
+                  value={state.settings.coverageSampleCount}
+                  onChange={(event) =>
+                    dispatch({
+                      type: "setSettings",
+                      settings: { ...state.settings, coverageSampleCount: Number(event.target.value) }
+                    })
+                  }
+                />
+              </label>
+            </div>
+          </details>
           <details>
             <summary>Import / Export</summary>
             <textarea
@@ -175,7 +392,20 @@ export const App = () => {
         </aside>
 
         <main className="viewport">
-          <SceneView mode="main" vehicle={state.vehicle} sensors={state.sensors} layers={state.layers} />
+          <SceneView
+            mode="main"
+            vehicle={state.vehicle}
+            sensors={state.sensors}
+            layers={state.layers}
+            scenarios={state.scenarios}
+            selectedSensorId={state.selectedSensorId}
+            enableEdit={false}
+            performanceMode={state.settings.performanceMode}
+            lidarPointCount={effectiveLidarPoints}
+            showLidarPoints={state.layers.lidar}
+            onSelect={(id) => dispatch({ type: "selectSensor", id })}
+            onUpdateSensor={handleSensorUpdate}
+          />
           <div className="stats" data-testid="visible-sensor-count">
             <span>Cameras: {countsByType.camera}</span>
             <span>Radar: {countsByType.radar}</span>
@@ -187,8 +417,59 @@ export const App = () => {
 
         <aside className="panel right">
           <div className="aux-views">
-            <SceneView mode="top" vehicle={state.vehicle} sensors={state.sensors} layers={state.layers} />
-            <SceneView mode="side" vehicle={state.vehicle} sensors={state.sensors} layers={state.layers} />
+            <SceneView
+              mode="top"
+              vehicle={state.vehicle}
+              sensors={state.sensors}
+              layers={state.layers}
+              scenarios={state.scenarios}
+              selectedSensorId={state.selectedSensorId}
+              enableEdit={state.settings.enableViewEditing}
+              performanceMode={state.settings.performanceMode}
+              lidarPointCount={effectiveLidarPoints}
+              showLidarPoints={state.layers.lidar}
+              coverage={state.settings.showCoverageHeatmap ? coverage : undefined}
+              onSelect={(id) => dispatch({ type: "selectSensor", id })}
+              onUpdateSensor={handleSensorUpdate}
+            />
+            <SceneView
+              mode="side"
+              vehicle={state.vehicle}
+              sensors={state.sensors}
+              layers={state.layers}
+              scenarios={state.scenarios}
+              selectedSensorId={state.selectedSensorId}
+              enableEdit={state.settings.enableViewEditing}
+              performanceMode={state.settings.performanceMode}
+              lidarPointCount={effectiveLidarPoints}
+              showLidarPoints={state.layers.lidar}
+              onSelect={(id) => dispatch({ type: "selectSensor", id })}
+              onUpdateSensor={handleSensorUpdate}
+            />
+          </div>
+          <div className="panel-section">
+            <h3>Coverage Metrics</h3>
+            <div className="metrics-grid">
+              <span>Camera</span>
+              <span>{coverage.total ? ((coverage.byType.camera / coverage.total) * 100).toFixed(1) : "0.0"}%</span>
+              <span>Radar</span>
+              <span>{coverage.total ? ((coverage.byType.radar / coverage.total) * 100).toFixed(1) : "0.0"}%</span>
+              <span>Combined</span>
+              <span>{coverage.total ? ((coverage.covered / coverage.total) * 100).toFixed(1) : "0.0"}%</span>
+            </div>
+          </div>
+          <div className="panel-section">
+            <h3>Scenario Coverage</h3>
+            <div className="metrics-grid">
+              <span>Pedestrian</span>
+              <span>
+                {state.scenarios.pedestrian.enabled ? (pedestrianCovered ? "Covered" : "Not covered") : "Disabled"}
+              </span>
+              <span>Intersection</span>
+              <span>
+                {state.scenarios.intersection.enabled ? (intersectionCovered ? "Covered" : "Not covered") : "Disabled"}
+              </span>
+            </div>
           </div>
           <div className="panel-section">
             <h3>Inspector</h3>

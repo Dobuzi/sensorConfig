@@ -40,4 +40,13 @@ describe("App interactions", () => {
     render(<App />);
     expect(screen.getByText(/Select a sensor to edit/i)).toBeInTheDocument();
   });
+
+  it("toggles top/side edit mode attribute", () => {
+    render(<App />);
+    const topView = screen.getByTestId("top-view");
+    expect(topView.getAttribute("data-edit-enabled")).toBe("false");
+    const toggle = screen.getByLabelText(/Edit Top\/Side/i);
+    fireEvent.click(toggle);
+    expect(topView.getAttribute("data-edit-enabled")).toBe("true");
+  });
 });

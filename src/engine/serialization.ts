@@ -51,12 +51,35 @@ const validateLayers = (layers: any) => {
     typeof layers.overlapHighlight === "boolean";
 };
 
+const validateSettings = (settings: any) => {
+  return settings &&
+    typeof settings.enableViewEditing === "boolean" &&
+    typeof settings.performanceMode === "boolean" &&
+    isNumber(settings.lidarPointCount) &&
+    isNumber(settings.coverageSampleCount) &&
+    typeof settings.showCoverageHeatmap === "boolean";
+};
+
+const validateScenarios = (scenarios: any) => {
+  return scenarios &&
+    scenarios.pedestrian &&
+    typeof scenarios.pedestrian.enabled === "boolean" &&
+    isNumber(scenarios.pedestrian.crossingDistanceM) &&
+    isNumber(scenarios.pedestrian.speedMps) &&
+    scenarios.intersection &&
+    typeof scenarios.intersection.enabled === "boolean" &&
+    isNumber(scenarios.intersection.centerDistanceM) &&
+    isNumber(scenarios.intersection.speedMps);
+};
+
 export const exportState = (state: AppState): ExportState => ({
   schemaVersion: state.schemaVersion,
   meta: state.meta,
   vehicle: state.vehicle,
   constraints: state.constraints,
   layers: state.layers,
+  settings: state.settings,
+  scenarios: state.scenarios,
   sensors: state.sensors
 });
 
@@ -74,6 +97,12 @@ export const importState = (raw: string) => {
     }
     if (!validateLayers(parsed.layers)) {
       return { ok: false, error: "Invalid layers data." } as const;
+    }
+    if (!validateSettings(parsed.settings)) {
+      return { ok: false, error: "Invalid settings data." } as const;
+    }
+    if (!validateScenarios(parsed.scenarios)) {
+      return { ok: false, error: "Invalid scenarios data." } as const;
     }
     if (!Array.isArray(parsed.sensors) || !parsed.sensors.every(validateSensor)) {
       return { ok: false, error: "Invalid sensor data." } as const;

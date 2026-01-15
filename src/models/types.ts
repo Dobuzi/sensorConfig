@@ -45,6 +45,8 @@ export type AppState = {
   vehicle: VehicleTemplate;
   constraints: Constraints;
   layers: Layers;
+  settings: UiSettings;
+  scenarios: ScenarioState;
   sensors: Sensor[];
   selectedSensorId: string | null;
   error: string | null;
@@ -53,3 +55,24 @@ export type AppState = {
 export type ExportState = Omit<AppState, "selectedSensorId" | "error">;
 
 export const SCHEMA_VERSION = "1.0.0";
+
+export type UiSettings = {
+  enableViewEditing: boolean;
+  performanceMode: boolean;
+  lidarPointCount: number;
+  coverageSampleCount: number;
+  showCoverageHeatmap: boolean;
+};
+
+export type ScenarioState = {
+  pedestrian: {
+    enabled: boolean;
+    crossingDistanceM: number;
+    speedMps: number;
+  };
+  intersection: {
+    enabled: boolean;
+    centerDistanceM: number;
+    speedMps: number;
+  };
+};

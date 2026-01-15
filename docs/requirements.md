@@ -27,6 +27,8 @@ Designers need a fast, visual way to configure autonomous-driving sensors on veh
 - Constraints: boundary clamp, min spacing (0.1–0.2m), mirror placement.
 - Rendering: 3D vehicle mesh, sensors, FOV frustums, overlap highlight.
 - Multi-view: main 3D view plus locked Top (XY) and Side (XZ) views.
+- Scenario overlays: pedestrian crossing and intersection markers with coverage flags.
+- Coverage metrics: ground-plane sampling with per-type and combined coverage%.
 - Import/export: schema versioning, validation, friendly errors.
 
 ## Non-functional Requirements
@@ -43,6 +45,7 @@ Designers need a fast, visual way to configure autonomous-driving sensors on veh
 - 3D frustums for FOV visualization.
 - Top/Side views must show world-aligned grids and angular rays.
 - Overlap detection for FOV volumes, deterministic and testable.
+- Optional coverage heatmap overlay in Top view.
 
 ## Presets Requirements
 - Tesla FSD: 8 cameras, no radar/ultrasonic/lidar (approximate layout).
@@ -62,3 +65,4 @@ Designers need a fast, visual way to configure autonomous-driving sensors on veh
 - Import/export round-trip matches original state (no loss of fields).
 - Overlap detection flags a known overlapping FOV case.
 - Layer toggles hide matching sensors in all views.
+- Scenario coverage indicator reflects whether markers are inside any active sensor FOV.

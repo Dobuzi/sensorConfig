@@ -8,8 +8,14 @@ Frontend-only React + TypeScript app running in the browser. No backend or exter
 - Recommendation engine: deterministic placement rules based on vehicle length/width anchors.
 - Constraint solver: boundary clamp, min-spacing separation, mirror placement.
 - Renderer (3D scene): Three.js scene with extruded vehicle mesh, sensors, and frustums.
+- Vehicle model: low-poly parametric mesh aligned to footprint dimensions.
 - Multi-view compositor: main interactive 3D view plus synchronized Top and Side projections.
+- Scenario overlays: pedestrian crossing and intersection geometry shared across views.
+- Coverage analyzer: ground-plane sampling for coverage% and heatmap projection.
+- LiDAR point cloud: deterministic seeded point generation per sensor.
 - Interaction layer: orbit controls for the main view; fixed cameras for projections.
+- View editing: optional Top/Side drag plane updates sensor pose in XY/XZ.
+- Performance guardrails: performance mode reduces LiDAR points, coverage samples, and aux view updates.
 - UI panels: compact left configuration panel and right inspector with auxiliary views.
 - Import/export + validation: JSON schemaVersion, parse/validate, user-friendly errors.
 
@@ -22,7 +28,7 @@ React Three Fiber + Three.js. The same scene graph is rendered in three canvases
 - Top view (orthographic camera, locked)
 - Side view (orthographic camera, locked)
 
-Top/Side views add world-aligned grid lines and angular rays for distance/angle references.
+Top/Side views add world-aligned grid lines, angular rays, and optional coverage heatmap.
 
 ## Testing Strategy
 - Unit tests for geometry, constraints, and recommendation engine.

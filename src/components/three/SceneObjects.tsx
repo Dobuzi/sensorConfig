@@ -1,8 +1,11 @@
 import { useMemo } from "react";
 import * as THREE from "three";
-import { Layers, Sensor, VehicleTemplate } from "../../models/types";
+import { Layers, ScenarioState, Sensor, VehicleTemplate } from "../../models/types";
 import { detectOverlaps } from "../../engine/overlap";
 import { useFrustumGeometry } from "./Frustum";
+import { VehicleModel3D } from "./VehicleModel3D";
+import { LidarPointCloud } from "./LidarPointCloud";
+import { ScenarioOverlays } from "./ScenarioOverlays";
 
 const SENSOR_COLORS: Record<string, string> = {
   camera: "#38bdf8",
@@ -13,19 +16,17 @@ const SENSOR_COLORS: Record<string, string> = {
 
 const toRad = (deg: number) => (deg * Math.PI) / 180;
 
-const useVehicleGeometry = (vehicle: VehicleTemplate) => {
-  return useMemo(() => {
-    const shape = new THREE.Shape();
-    vehicle.footprintPolygon.forEach((point, index) => {
-      if (index === 0) shape.moveTo(point.x, point.y);
-      else shape.lineTo(point.x, point.y);
-    });
-    shape.closePath();
-    return new THREE.ExtrudeGeometry(shape, { depth: 0.4, bevelEnabled: false });
-  }, [vehicle]);
-};
-
-const SensorMesh = ({ sensor }: { sensor: Sensor }) => {
+const SensorMesh = ({
+  sensor,
+  onPointerDown,
+  showLidarPoints,
+  lidarPointCount
+}: {
+  sensor: Sensor;
+  onPointerDown?: (sensor: Sensor) => void;
+  showLidarPoints: boolean;
+  lidarPointCount: number;
+}) => {
   const geometry = useMemo(() => new THREE.BoxGeometry(0.12, 0.08, 0.06), []);
   const material = useMemo(
     () => new THREE.MeshStandardMaterial({ color: SENSOR_COLORS[sensor.type] }),
@@ -57,11 +58,21 @@ const SensorMesh = ({ sensor }: { sensor: Sensor }) => {
         "ZYX"
       )}
     >
-      <mesh geometry={geometry} material={material} />
+      <mesh
+        geometry={geometry}
+        material={material}
+        onPointerDown={(event) => {
+          event.stopPropagation();
+          onPointerDown?.(sensor);
+        }}
+      />
       <mesh geometry={frustum} material={frustumMaterial} />
       <line geometry={lineGeom}>
         <lineBasicMaterial color={SENSOR_COLORS[sensor.type]} transparent opacity={0.5} />
       </line>
+      {sensor.type === "lidar" && showLidarPoints && (
+        <LidarPointCloud sensor={sensor} pointCount={lidarPointCount} />
+      )}
     </group>
   );
 };
@@ -69,28 +80,37 @@ const SensorMesh = ({ sensor }: { sensor: Sensor }) => {
 export const SceneObjects = ({
   vehicle,
   sensors,
-  layers
+  layers,
+  scenarios,
+  onSensorPointerDown,
+  showLidarPoints,
+  lidarPointCount
 }: {
   vehicle: VehicleTemplate;
   sensors: Sensor[];
   layers: Layers;
+  scenarios: ScenarioState;
+  onSensorPointerDown?: (sensor: Sensor) => void;
+  showLidarPoints: boolean;
+  lidarPointCount: number;
 }) => {
-  const vehicleGeometry = useVehicleGeometry(vehicle);
   const overlaps = useMemo(() => detectOverlaps(sensors), [sensors]);
 
   return (
     <group>
-      <mesh geometry={vehicleGeometry} position={[0, 0, 0]}>
-        <meshStandardMaterial color="#e2e8f0" />
-      </mesh>
-      <mesh geometry={vehicleGeometry} position={[0, 0, 0]}>
-        <meshStandardMaterial color="#1f2937" wireframe transparent opacity={0.3} />
-      </mesh>
+      <VehicleModel3D vehicle={vehicle} />
       {sensors
         .filter((sensor) => sensor.enabled && layers[sensor.type])
         .map((sensor) => (
-          <SensorMesh key={sensor.id} sensor={sensor} />
+          <SensorMesh
+            key={sensor.id}
+            sensor={sensor}
+            onPointerDown={onSensorPointerDown}
+            showLidarPoints={showLidarPoints}
+            lidarPointCount={lidarPointCount}
+          />
         ))}
+      <ScenarioOverlays scenarios={scenarios} />
       {layers.overlapHighlight &&
         overlaps.map((overlap) => {
           const [aId, bId] = overlap.pair;

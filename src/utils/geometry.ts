@@ -53,6 +53,16 @@ export const wedgeTriangle = (origin: Vec2, yawDeg: number, fovDeg: number, rang
   return [origin, right, left];
 };
 
+export const pointInTriangle = (p: Vec2, a: Vec2, b: Vec2, c: Vec2) => {
+  const area = (p1: Vec2, p2: Vec2, p3: Vec2) =>
+    (p1.x * (p2.y - p3.y) + p2.x * (p3.y - p1.y) + p3.x * (p1.y - p2.y));
+  const full = Math.abs(area(a, b, c));
+  const a1 = Math.abs(area(p, b, c));
+  const a2 = Math.abs(area(a, p, c));
+  const a3 = Math.abs(area(a, b, p));
+  return Math.abs(full - (a1 + a2 + a3)) < 1e-5;
+};
+
 const polygonArea = (poly: Vec2[]) => {
   let area = 0;
   for (let i = 0; i < poly.length; i += 1) {

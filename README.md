@@ -4,10 +4,12 @@ A production-ready MVP for designing autonomous-driving sensor configurations wi
 
 ## Features
 - 3D visualization with main view plus Top/Side projections
+- Scenario overlays (pedestrian crossing, intersection) with coverage checks
 - Vehicle templates: sedan, hatchback, SUV
 - Deterministic presets (Tesla FSD, NCAP, Robotaxi)
 - Constraint enforcement: boundary clamp, min spacing, mirror placement
 - FOV frustums, overlap highlights, and layer toggles
+- Coverage metrics and optional heatmap overlay
 - Import/export with 3D-ready schema and validation
 
 ## Project Structure
