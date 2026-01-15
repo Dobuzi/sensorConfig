@@ -1,0 +1,168 @@
+:root {
+  color-scheme: light;
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+  background: radial-gradient(circle at top, #f8fafc, #e2e8f0);
+  color: #0f172a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 32px;
+  background: linear-gradient(120deg, #0f172a, #1e293b);
+  color: #f8fafc;
+}
+
+.header h1 {
+  margin: 0 0 6px 0;
+  font-size: 24px;
+}
+
+.header p {
+  margin: 0;
+  opacity: 0.8;
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+}
+
+.content {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 260px 1fr 280px;
+  gap: 16px;
+  padding: 16px 24px 24px;
+}
+
+.panel {
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.panel section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.panel h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.panel label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.panel input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+.panel textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.preset-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+button {
+  border: none;
+  background: #0ea5e9;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #0284c7;
+}
+
+.button-row {
+  display: flex;
+  gap: 8px;
+}
+
+.canvas-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.canvas-wrapper {
+  position: relative;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #cbd5f5;
+  overflow: hidden;
+  padding: 12px;
+}
+
+.canvas-wrapper canvas {
+  width: 100%;
+  height: auto;
+}
+
+.canvas-meta {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: rgba(15, 23, 42, 0.8);
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.stats {
+  display: flex;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.inspector {
+  display: grid;
+  gap: 10px;
+}
+
+.error {
+  color: #b91c1c;
+  font-size: 13px;
+}
+
+@media (max-width: 1100px) {
+  .content {
+    grid-template-columns: 1fr;
+  }
+}
