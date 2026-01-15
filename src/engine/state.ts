@@ -45,10 +45,7 @@ export const reducer = (state: AppState, action: Action): AppState => {
       return { ...state, vehicle: action.vehicle, sensors };
     }
     case "applyPreset": {
-      const sensors = presetSensors(action.preset, state.vehicle).map((sensor, index) => ({
-        ...sensor,
-        mirrorGroup: sensor.type === "camera" && index % 2 === 0 ? `group-${index}` : undefined
-      }));
+      const sensors = presetSensors(action.preset, state.vehicle);
       const constrained = enforceConstraints(sensors, state.vehicle, state.constraints);
       return {
         ...state,

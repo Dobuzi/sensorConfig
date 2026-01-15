@@ -11,26 +11,17 @@ const sedan = VEHICLES.sedan;
 
 describe("recommendation presets", () => {
   it("creates deterministic placements for each preset", () => {
-    const fsd = presetSensors("fsd-camera", sedan);
-    expect(fsd.map((sensor) => sensor.id)).toEqual([
-      "fsd-camera-front-wide",
-      "fsd-camera-front-narrow",
-      "fsd-camera-front-side-left",
-      "fsd-camera-front-side-right",
-      "fsd-camera-rear",
-      "fsd-camera-rear-left",
-      "fsd-camera-rear-right"
-    ]);
+    const tesla = presetSensors("tesla-fsd", sedan);
+    expect(tesla.map((sensor) => sensor.id)).toContain("tesla-fsd-front-wide");
+    expect(tesla.filter((sensor) => sensor.type === "camera")).toHaveLength(8);
 
-    const adas = presetSensors("adas-ncap", sedan);
-    expect(adas.find((sensor) => sensor.label === "Front")?.pose.position.x).toBeCloseTo(2.15, 2);
-    expect(adas.find((sensor) => sensor.label === "Front Radar")?.type).toBe("radar");
+    const ncap = presetSensors("ncap", sedan);
+    expect(ncap.filter((sensor) => sensor.type === "camera")).toHaveLength(7);
+    expect(ncap.filter((sensor) => sensor.type === "radar")).toHaveLength(3);
+    expect(ncap.filter((sensor) => sensor.type === "ultrasonic")).toHaveLength(12);
 
     const robotaxi = presetSensors("robotaxi", sedan);
-    expect(robotaxi.find((sensor) => sensor.type === "lidar")?.label).toBe("Roof");
-
-    const hw4 = presetSensors("tesla-hw4", sedan);
-    expect(hw4.map((sensor) => sensor.label)).toContain("B-Pillar Left");
+    expect(robotaxi.find((sensor) => sensor.type === "lidar")?.label).toBe("Roof Lidar");
   });
 });
 

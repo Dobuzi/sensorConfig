@@ -3,17 +3,18 @@
 A production-ready MVP for designing autonomous-driving sensor configurations with presets, constraints, and JSON import/export. Built with React + TypeScript + Vite and deployed via GitHub Pages.
 
 ## Features
+- 3D visualization with main view plus Top/Side projections
 - Vehicle templates: sedan, hatchback, SUV
-- Deterministic presets (FSD-like, ADAS/NCAP, Robotaxi/AV, Tesla HW4 approx)
+- Deterministic presets (Tesla FSD, NCAP, Robotaxi)
 - Constraint enforcement: boundary clamp, min spacing, mirror placement
-- 2D canvas visualization with FOV wedges, boresight, overlap highlight
+- FOV frustums, overlap highlights, and layer toggles
 - Import/export with 3D-ready schema and validation
 
 ## Project Structure
 - `docs/requirements.md` Requirements specification
 - `docs/architecture.md` System architecture
 - `src/engine/` Presets, constraints, overlap, serialization, state
-- `src/components/` Canvas renderer
+- `src/components/` Three.js views and UI
 - `src/__tests__/` Vitest + Testing Library tests
 
 ## Scripts
@@ -31,12 +32,11 @@ npm run dev
 ```
 
 ## Usage
-- Select a vehicle template (sedan, hatchback, SUV) from the left panel.
-- Apply a preset to generate a baseline sensor layout.
-- Drag sensors in the canvas to reposition them inside the footprint.
-- Use the inspector to adjust yaw, FOV, and range.
+- Select a vehicle template and preset from the left panel.
+- Inspect the 3D view (center) and Top/Side views (right).
+- Adjust pose, orientation, FOV, and range in the inspector.
 - Toggle layers to show/hide sensor types and overlap highlights.
-- Export JSON to capture the current configuration, or import JSON to restore it.
+- Export JSON to capture the configuration, or import JSON to restore it.
 
 ## GitHub Pages Deployment
 The workflow at `.github/workflows/deploy.yml` builds and deploys on `main`.

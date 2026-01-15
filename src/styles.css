@@ -23,71 +23,113 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 32px;
+  padding: 16px 28px;
   background: linear-gradient(120deg, #0f172a, #1e293b);
   color: #f8fafc;
 }
 
 .header h1 {
-  margin: 0 0 6px 0;
-  font-size: 24px;
+  margin: 0 0 4px 0;
+  font-size: 22px;
 }
 
 .header p {
   margin: 0;
   opacity: 0.8;
+  font-size: 13px;
 }
 
 .meta {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  font-size: 14px;
+  font-size: 12px;
 }
 
-.content {
+.layout {
   flex: 1;
   display: grid;
-  grid-template-columns: 260px 1fr 280px;
+  grid-template-columns: 240px minmax(0, 1fr) 320px;
   gap: 16px;
-  padding: 16px 24px 24px;
+  padding: 16px 20px 24px;
 }
 
 .panel {
   background: rgba(255, 255, 255, 0.92);
   border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+  padding: 14px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
-.panel section {
+.panel.compact details {
+  border-bottom: 1px solid rgba(148, 163, 184, 0.3);
+  padding-bottom: 10px;
+}
+
+.panel.compact details:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+summary {
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.panel summary::-webkit-details-marker {
+  display: none;
+}
+
+.panel details > *:not(summary) {
+  margin-top: 10px;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.inline-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  font-size: 12px;
+}
+
+.toggle {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.panel h2 {
-  margin: 0;
-  font-size: 16px;
+  align-items: center;
+  gap: 6px;
 }
 
 .panel label {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  font-size: 13px;
+  font-size: 12px;
+}
+
+.panel input,
+.panel select,
+.panel textarea {
+  border: 1px solid #cbd5f5;
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 12px;
 }
 
 .panel input[type="checkbox"] {
-  margin-right: 8px;
+  margin: 0;
 }
 
 .panel textarea {
   resize: vertical;
-  min-height: 120px;
+  min-height: 90px;
 }
 
 .preset-list {
@@ -96,17 +138,34 @@ body {
   gap: 8px;
 }
 
+.preset-list button {
+  display: grid;
+  gap: 2px;
+  text-align: left;
+}
+
+.preset-list small {
+  font-size: 11px;
+  opacity: 0.7;
+}
+
 button {
   border: none;
   background: #0ea5e9;
   color: #fff;
-  padding: 8px 12px;
+  padding: 8px 10px;
   border-radius: 8px;
   cursor: pointer;
+  font-size: 12px;
 }
 
 button:hover {
   background: #0284c7;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .button-row {
@@ -114,40 +173,62 @@ button:hover {
   gap: 8px;
 }
 
-.canvas-panel {
+.viewport {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
-.canvas-wrapper {
+.scene-view {
   position: relative;
   background: #f8fafc;
-  border-radius: 12px;
+  border-radius: 14px;
   border: 1px solid #cbd5f5;
   overflow: hidden;
-  padding: 12px;
+  min-height: 420px;
 }
 
-.canvas-wrapper canvas {
+.scene-view.top,
+.scene-view.side {
+  min-height: 200px;
+}
+
+.scene-view canvas {
   width: 100%;
-  height: auto;
+  height: 100%;
 }
 
-.canvas-meta {
+.view-label {
   position: absolute;
-  bottom: 12px;
-  right: 12px;
-  background: rgba(15, 23, 42, 0.8);
-  color: #fff;
+  top: 10px;
+  left: 10px;
+  font-size: 11px;
   padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 12px;
+  background: rgba(15, 23, 42, 0.7);
+  color: #f8fafc;
+  border-radius: 999px;
 }
 
 .stats {
   display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 12px;
+}
+
+.aux-views {
+  display: grid;
   gap: 12px;
+}
+
+.panel-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.panel-section h3 {
+  margin: 0;
   font-size: 13px;
 }
 
@@ -156,13 +237,29 @@ button:hover {
   gap: 10px;
 }
 
-.error {
-  color: #b91c1c;
-  font-size: 13px;
+.inspector-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
 }
 
-@media (max-width: 1100px) {
-  .content {
+.inspector-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.error {
+  color: #b91c1c;
+  font-size: 12px;
+}
+
+@media (max-width: 1200px) {
+  .layout {
     grid-template-columns: 1fr;
+  }
+  .scene-view {
+    min-height: 320px;
   }
 }
