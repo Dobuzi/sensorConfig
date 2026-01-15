@@ -57,7 +57,8 @@ const validateSettings = (settings: any) => {
     typeof settings.performanceMode === "boolean" &&
     isNumber(settings.lidarPointCount) &&
     isNumber(settings.coverageSampleCount) &&
-    typeof settings.showCoverageHeatmap === "boolean";
+    typeof settings.showCoverageHeatmap === "boolean" &&
+    (typeof settings.compactMode === "boolean" || typeof settings.compactMode === "undefined");
 };
 
 const validateScenarios = (scenarios: any) => {

@@ -48,7 +48,8 @@ const baseSettings: UiSettings = {
   performanceMode: false,
   lidarPointCount: 5000,
   coverageSampleCount: 2000,
-  showCoverageHeatmap: false
+  showCoverageHeatmap: false,
+  compactMode: true
 };
 
 const baseScenarios: ScenarioState = {
@@ -120,7 +121,7 @@ export const reducer = (state: AppState, action: Action): AppState => {
     }
     case "importState": {
       const vendors = action.state.vendors ?? baseVendors;
-      const settings = action.state.settings ?? baseSettings;
+      const settings = action.state.settings ? { ...baseSettings, ...action.state.settings } : baseSettings;
       const scenarios = action.state.scenarios ?? baseScenarios;
       const sensorsWithSpecs = applyVendorSpecs(action.state.sensors, vendors);
       const sensors = enforceConstraints(sensorsWithSpecs, action.state.vehicle, action.state.constraints);

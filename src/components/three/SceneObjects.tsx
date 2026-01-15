@@ -6,13 +6,7 @@ import { useFrustumGeometry } from "./Frustum";
 import { VehicleModel3D } from "./VehicleModel3D";
 import { LidarPointCloud } from "./LidarPointCloud";
 import { ScenarioOverlays } from "./ScenarioOverlays";
-
-const SENSOR_COLORS: Record<string, string> = {
-  camera: "#38bdf8",
-  radar: "#fb923c",
-  ultrasonic: "#4ade80",
-  lidar: "#f87171"
-};
+import { SENSOR_TYPE_COLORS } from "../../theme/sensorColors";
 
 const toRad = (deg: number) => (deg * Math.PI) / 180;
 
@@ -27,15 +21,28 @@ const SensorMesh = ({
   showLidarPoints: boolean;
   lidarPointCount: number;
 }) => {
-  const geometry = useMemo(() => new THREE.BoxGeometry(0.12, 0.08, 0.06), []);
+  const geometry = useMemo(() => {
+    switch (sensor.type) {
+      case "camera":
+        return new THREE.BoxGeometry(0.12, 0.08, 0.06);
+      case "radar":
+        return new THREE.CylinderGeometry(0.05, 0.05, 0.06, 12);
+      case "ultrasonic":
+        return new THREE.SphereGeometry(0.04, 12, 12);
+      case "lidar":
+        return new THREE.ConeGeometry(0.05, 0.08, 12);
+      default:
+        return new THREE.BoxGeometry(0.12, 0.08, 0.06);
+    }
+  }, [sensor.type]);
   const material = useMemo(
-    () => new THREE.MeshStandardMaterial({ color: SENSOR_COLORS[sensor.type] }),
+    () => new THREE.MeshStandardMaterial({ color: SENSOR_TYPE_COLORS[sensor.type] }),
     [sensor.type]
   );
   const frustum = useFrustumGeometry(sensor.fov.horizontalDeg, sensor.fov.verticalDeg, sensor.rangeM);
   const frustumMaterial = useMemo(
     () => new THREE.MeshStandardMaterial({
-      color: SENSOR_COLORS[sensor.type],
+      color: SENSOR_TYPE_COLORS[sensor.type],
       transparent: true,
       opacity: 0.15
     }),
@@ -68,7 +75,7 @@ const SensorMesh = ({
       />
       <mesh geometry={frustum} material={frustumMaterial} />
       <line geometry={lineGeom}>
-        <lineBasicMaterial color={SENSOR_COLORS[sensor.type]} transparent opacity={0.5} />
+        <lineBasicMaterial color={SENSOR_TYPE_COLORS[sensor.type]} transparent opacity={0.5} />
       </line>
       {sensor.type === "lidar" && showLidarPoints && (
         <LidarPointCloud

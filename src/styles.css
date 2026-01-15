@@ -28,6 +28,14 @@ body {
   color: #f8fafc;
 }
 
+.app.compact .header {
+  padding: 12px 20px;
+}
+
+.app.compact .header h1 {
+  font-size: 20px;
+}
+
 .header h1 {
   margin: 0 0 4px 0;
   font-size: 22px;
@@ -54,6 +62,12 @@ body {
   padding: 16px 20px 24px;
 }
 
+.layout.compact {
+  grid-template-columns: 210px minmax(0, 1fr) 280px;
+  gap: 12px;
+  padding: 12px 16px 20px;
+}
+
 .panel {
   background: rgba(255, 255, 255, 0.92);
   border-radius: 12px;
@@ -62,6 +76,11 @@ body {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.panel.compact {
+  padding: 10px;
+  gap: 10px;
 }
 
 .panel.compact details {
@@ -138,6 +157,11 @@ summary {
   font-size: 12px;
 }
 
+.panel.compact label {
+  font-size: 11px;
+  gap: 4px;
+}
+
 .panel input,
 .panel select,
 .panel textarea {
@@ -145,6 +169,13 @@ summary {
   border-radius: 6px;
   padding: 6px 8px;
   font-size: 12px;
+}
+
+.panel.compact input,
+.panel.compact select,
+.panel.compact textarea {
+  padding: 4px 6px;
+  font-size: 11px;
 }
 
 .panel input[type="checkbox"] {
@@ -168,6 +199,10 @@ summary {
   text-align: left;
 }
 
+.panel.compact .preset-list button {
+  padding: 6px 8px;
+}
+
 .preset-list small {
   font-size: 11px;
   opacity: 0.7;
@@ -181,6 +216,17 @@ button {
   border-radius: 8px;
   cursor: pointer;
   font-size: 12px;
+}
+
+button.ghost {
+  background: rgba(15, 23, 42, 0.7);
+  color: #f8fafc;
+  padding: 6px 10px;
+  font-size: 11px;
+}
+
+button.ghost:hover {
+  background: rgba(15, 23, 42, 0.85);
 }
 
 button:hover {
@@ -201,6 +247,7 @@ button:disabled {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  position: relative;
 }
 
 .scene-view {
@@ -233,6 +280,58 @@ button:disabled {
   border-radius: 999px;
 }
 
+.scene-overlay {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.scene-overlay > * {
+  pointer-events: auto;
+}
+
+.legend {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  border-radius: 10px;
+  padding: 8px 10px;
+  display: grid;
+  gap: 6px;
+  font-size: 11px;
+  min-width: 140px;
+}
+
+.legend-title {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: #475569;
+}
+
+.legend-empty {
+  color: #64748b;
+  font-size: 11px;
+}
+
+.legend-item {
+  display: grid;
+  grid-template-columns: auto 10px 1fr;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
 .stats {
   display: flex;
   flex-wrap: wrap;
@@ -261,6 +360,25 @@ button:disabled {
   gap: 10px;
 }
 
+.inspector-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.inspector-tabs button {
+  background: #e2e8f0;
+  color: #0f172a;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+}
+
+.inspector-tabs button.active {
+  background: #0ea5e9;
+  color: #fff;
+}
+
 .inspector-header {
   display: flex;
   justify-content: space-between;
@@ -272,6 +390,22 @@ button:disabled {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
+}
+
+.inspector-advanced {
+  display: grid;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.inspector-advanced div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.inspector-advanced strong {
+  font-weight: 600;
 }
 
 .metrics-grid {

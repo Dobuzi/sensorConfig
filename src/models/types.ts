@@ -65,6 +65,7 @@ export type UiSettings = {
   lidarPointCount: number;
   coverageSampleCount: number;
   showCoverageHeatmap: boolean;
+  compactMode: boolean;
 };
 
 export type VendorSelection = {

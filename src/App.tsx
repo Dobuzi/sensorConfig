@@ -1,5 +1,6 @@
 import { useMemo, useReducer, useState } from "react";
 import { SceneView } from "./components/SceneView";
+import { SensorLegend } from "./components/SensorLegend";
 import { computeCoverage, scenarioCovered } from "./engine/coverage";
 import { scenarioMarkers } from "./engine/scenarios";
 import { exportState, importState } from "./engine/serialization";
@@ -7,7 +8,7 @@ import { detectOverlaps } from "./engine/overlap";
 import { PresetId, presetSensors, presetVendors } from "./engine/presets";
 import { createInitialState, reducer } from "./engine/state";
 import { VEHICLES } from "./models/vehicles";
-import { Sensor } from "./models/types";
+import { Sensor, SensorType } from "./models/types";
 import { vendorOptions } from "./specs/sensorVendors";
 
 const presetOptions: { id: PresetId; label: string; sublabel: string }[] = [
@@ -19,6 +20,8 @@ const presetOptions: { id: PresetId; label: string; sublabel: string }[] = [
 export const App = () => {
   const [state, dispatch] = useReducer(reducer, undefined, createInitialState);
   const [importText, setImportText] = useState("");
+  const [inspectorTab, setInspectorTab] = useState<"pose" | "fov" | "advanced">("pose");
+  const [resetViewToken, setResetViewToken] = useState(0);
 
   const selectedSensor = state.sensors.find((sensor) => sensor.id === state.selectedSensorId) || null;
   const overlaps = useMemo(() => detectOverlaps(state.sensors), [state.sensors]);
@@ -70,6 +73,16 @@ export const App = () => {
     return counts;
   }, [state.sensors]);
 
+  const presentTypes = useMemo(() => {
+    const types: SensorType[] = [];
+    (["camera", "radar", "ultrasonic", "lidar"] as const).forEach((type) => {
+      if (countsByType[type] > 0) {
+        types.push(type);
+      }
+    });
+    return types;
+  }, [countsByType]);
+
   const visibleSensors = useMemo(
     () => state.sensors.filter((sensor) => sensor.enabled && state.layers[sensor.type]),
     [state.sensors, state.layers]
@@ -79,8 +92,10 @@ export const App = () => {
   const ultrasonicVendors = useMemo(() => vendorOptions("ultrasonic"), []);
   const lidarVendors = useMemo(() => vendorOptions("lidar"), []);
 
+  const isCompact = state.settings.compactMode;
+
   return (
-    <div className="app">
+    <div className={`app ${isCompact ? "compact" : ""}`}>
       <header className="header">
         <div>
           <h1>Sensor Configuration Studio</h1>
@@ -91,9 +106,20 @@ export const App = () => {
           <span>Preset: {state.meta.presetId || "custom"}</span>
         </div>
       </header>
-      <div className="layout">
-        <aside className="panel left compact">
+      <div className={`layout ${isCompact ? "compact" : ""}`}>
+        <aside className={`panel left ${isCompact ? "compact" : ""}`}>
           <details open>
+            <summary>Presets</summary>
+            <div className="preset-list">
+              {presetOptions.map((preset) => (
+                <button key={preset.id} onClick={() => handlePreset(preset.id)}>
+                  <span>{preset.label}</span>
+                  <small>{preset.sublabel}</small>
+                </button>
+              ))}
+            </div>
+          </details>
+          <details open={!isCompact}>
             <summary>Vehicle</summary>
             <div className="field">
               <label>Template</label>
@@ -108,17 +134,24 @@ export const App = () => {
             </div>
           </details>
           <details open>
-            <summary>Presets</summary>
-            <div className="preset-list">
-              {presetOptions.map((preset) => (
-                <button key={preset.id} onClick={() => handlePreset(preset.id)}>
-                  <span>{preset.label}</span>
-                  <small>{preset.sublabel}</small>
-                </button>
-              ))}
+            <summary>Display</summary>
+            <div className="inline-grid">
+              <label className="toggle">
+                <input
+                  type="checkbox"
+                  checked={state.settings.compactMode}
+                  onChange={(event) =>
+                    dispatch({
+                      type: "setSettings",
+                      settings: { ...state.settings, compactMode: event.target.checked }
+                    })
+                  }
+                />
+                Compact Mode
+              </label>
             </div>
           </details>
-          <details open>
+          <details open={!isCompact}>
             <summary>Constraints</summary>
             <div className="inline-grid">
               <label className="toggle">
@@ -165,7 +198,7 @@ export const App = () => {
               </label>
             </div>
           </details>
-          <details open>
+          <details open={!isCompact}>
             <summary>Layers</summary>
             <div className="inline-grid">
               {(["camera", "radar", "ultrasonic", "lidar", "overlapHighlight"] as const).map((layer) => (
@@ -182,7 +215,7 @@ export const App = () => {
               ))}
             </div>
           </details>
-          <details open>
+          <details open={!isCompact}>
             <summary>Sensor Vendors</summary>
             <div className="vendor-grid">
               <label>
@@ -258,7 +291,7 @@ export const App = () => {
               </a>
             </div>
           </details>
-          <details open>
+          <details open={!isCompact}>
             <summary>Editing</summary>
             <div className="inline-grid">
               <label className="toggle">
@@ -289,7 +322,7 @@ export const App = () => {
               </label>
             </div>
           </details>
-          <details open>
+          <details open={!isCompact}>
             <summary>Scenarios</summary>
             <div className="scenario-grid">
               <label className="toggle">
@@ -406,7 +439,7 @@ export const App = () => {
               </label>
             </div>
           </details>
-          <details open>
+          <details open={!isCompact}>
             <summary>Performance</summary>
             <div className="inline-grid">
               <label className="toggle">
@@ -484,9 +517,27 @@ export const App = () => {
             performanceMode={state.settings.performanceMode}
             lidarPointCount={effectiveLidarPoints}
             showLidarPoints={state.layers.lidar}
+            resetKey={resetViewToken}
             onSelect={(id) => dispatch({ type: "selectSensor", id })}
             onUpdateSensor={handleSensorUpdate}
-          />
+          >
+            <div className="scene-overlay">
+              <button
+                type="button"
+                className="ghost"
+                onClick={() => setResetViewToken((value) => value + 1)}
+              >
+                Reset View
+              </button>
+              <SensorLegend
+                presentTypes={presentTypes}
+                layers={state.layers}
+                onToggle={(type, enabled) =>
+                  dispatch({ type: "setLayers", layers: { ...state.layers, [type]: enabled } })
+                }
+              />
+            </div>
+          </SceneView>
           <div className="stats" data-testid="visible-sensor-count">
             <span>Cameras: {countsByType.camera}</span>
             <span>Radar: {countsByType.radar}</span>
@@ -496,7 +547,7 @@ export const App = () => {
           </div>
         </main>
 
-        <aside className="panel right">
+        <aside className={`panel right ${isCompact ? "compact" : ""}`}>
           <div className="aux-views">
             <SceneView
               mode="top"
@@ -528,8 +579,8 @@ export const App = () => {
               onUpdateSensor={handleSensorUpdate}
             />
           </div>
-          <div className="panel-section">
-            <h3>Coverage Metrics</h3>
+          <details open={!isCompact}>
+            <summary>Coverage Metrics</summary>
             <div className="metrics-grid">
               <span>Camera</span>
               <span>{coverage.total ? ((coverage.byType.camera / coverage.total) * 100).toFixed(1) : "0.0"}%</span>
@@ -538,9 +589,9 @@ export const App = () => {
               <span>Combined</span>
               <span>{coverage.total ? ((coverage.covered / coverage.total) * 100).toFixed(1) : "0.0"}%</span>
             </div>
-          </div>
-          <div className="panel-section">
-            <h3>Scenario Coverage</h3>
+          </details>
+          <details open={!isCompact}>
+            <summary>Scenario Coverage</summary>
             <div className="metrics-grid">
               <span>Pedestrian</span>
               <span>
@@ -551,9 +602,9 @@ export const App = () => {
                 {state.scenarios.intersection.enabled ? (intersectionCovered ? "Covered" : "Not covered") : "Disabled"}
               </span>
             </div>
-          </div>
-          <div className="panel-section">
-            <h3>Inspector</h3>
+          </details>
+          <details open>
+            <summary>Inspector</summary>
             {selectedSensor ? (
               <div className="inspector">
                 <div className="inspector-header">
@@ -576,144 +627,195 @@ export const App = () => {
                     ))}
                   </select>
                 </label>
-                <div className="inspector-grid">
-                  <label>
-                    X
-                    <input
-                      type="number"
-                      step={0.05}
-                      value={selectedSensor.pose.position.x}
-                      onChange={(event) =>
-                        handleSensorUpdate({
-                          ...selectedSensor,
-                          pose: {
-                            ...selectedSensor.pose,
-                            position: { ...selectedSensor.pose.position, x: Number(event.target.value) }
-                          }
-                        })
-                      }
-                    />
-                  </label>
-                  <label>
-                    Y
-                    <input
-                      type="number"
-                      step={0.05}
-                      value={selectedSensor.pose.position.y}
-                      onChange={(event) =>
-                        handleSensorUpdate({
-                          ...selectedSensor,
-                          pose: {
-                            ...selectedSensor.pose,
-                            position: { ...selectedSensor.pose.position, y: Number(event.target.value) }
-                          }
-                        })
-                      }
-                    />
-                  </label>
-                  <label>
-                    Z
-                    <input
-                      type="number"
-                      step={0.05}
-                      value={selectedSensor.pose.position.z}
-                      onChange={(event) =>
-                        handleSensorUpdate({
-                          ...selectedSensor,
-                          pose: {
-                            ...selectedSensor.pose,
-                            position: { ...selectedSensor.pose.position, z: Number(event.target.value) }
-                          }
-                        })
-                      }
-                    />
-                  </label>
-                  <label>
-                    Yaw
-                    <input
-                      type="number"
-                      step={1}
-                      value={selectedSensor.pose.orientation.yawDeg}
-                      onChange={(event) =>
-                        handleSensorUpdate({
-                          ...selectedSensor,
-                          pose: {
-                            ...selectedSensor.pose,
-                            orientation: {
-                              ...selectedSensor.pose.orientation,
-                              yawDeg: Number(event.target.value)
-                            }
-                          }
-                        })
-                      }
-                    />
-                  </label>
-                  <label>
-                    Pitch
-                    <input
-                      type="number"
-                      step={1}
-                      value={selectedSensor.pose.orientation.pitchDeg}
-                      onChange={(event) =>
-                        handleSensorUpdate({
-                          ...selectedSensor,
-                          pose: {
-                            ...selectedSensor.pose,
-                            orientation: {
-                              ...selectedSensor.pose.orientation,
-                              pitchDeg: Number(event.target.value)
-                            }
-                          }
-                        })
-                      }
-                    />
-                  </label>
-                  <label>
-                    Roll
-                    <input
-                      type="number"
-                      step={1}
-                      value={selectedSensor.pose.orientation.rollDeg}
-                      onChange={(event) =>
-                        handleSensorUpdate({
-                          ...selectedSensor,
-                          pose: {
-                            ...selectedSensor.pose,
-                            orientation: {
-                              ...selectedSensor.pose.orientation,
-                              rollDeg: Number(event.target.value)
-                            }
-                          }
-                        })
-                      }
-                    />
-                  </label>
-                  <label>
-                    FOV
-                    <input
-                      type="number"
-                      step={1}
-                      value={selectedSensor.fov.horizontalDeg}
-                      onChange={(event) =>
-                        handleSensorUpdate({
-                          ...selectedSensor,
-                          fov: { ...selectedSensor.fov, horizontalDeg: Number(event.target.value) }
-                        })
-                      }
-                    />
-                  </label>
-                  <label>
-                    Range (m)
-                    <input
-                      type="number"
-                      step={5}
-                      value={selectedSensor.rangeM}
-                      onChange={(event) =>
-                        handleSensorUpdate({ ...selectedSensor, rangeM: Number(event.target.value) })
-                      }
-                    />
-                  </label>
+                <div className="inspector-tabs">
+                  {(["pose", "fov", "advanced"] as const).map((tab) => (
+                    <button
+                      key={tab}
+                      className={inspectorTab === tab ? "active" : ""}
+                      onClick={() => setInspectorTab(tab)}
+                      type="button"
+                    >
+                      {tab.toUpperCase()}
+                    </button>
+                  ))}
                 </div>
+                {inspectorTab === "pose" && (
+                  <div className="inspector-grid">
+                    <label>
+                      X
+                      <input
+                        type="number"
+                        step={0.05}
+                        value={selectedSensor.pose.position.x}
+                        onChange={(event) =>
+                          handleSensorUpdate({
+                            ...selectedSensor,
+                            pose: {
+                              ...selectedSensor.pose,
+                              position: { ...selectedSensor.pose.position, x: Number(event.target.value) }
+                            }
+                          })
+                        }
+                      />
+                    </label>
+                    <label>
+                      Y
+                      <input
+                        type="number"
+                        step={0.05}
+                        value={selectedSensor.pose.position.y}
+                        onChange={(event) =>
+                          handleSensorUpdate({
+                            ...selectedSensor,
+                            pose: {
+                              ...selectedSensor.pose,
+                              position: { ...selectedSensor.pose.position, y: Number(event.target.value) }
+                            }
+                          })
+                        }
+                      />
+                    </label>
+                    <label>
+                      Z
+                      <input
+                        type="number"
+                        step={0.05}
+                        value={selectedSensor.pose.position.z}
+                        onChange={(event) =>
+                          handleSensorUpdate({
+                            ...selectedSensor,
+                            pose: {
+                              ...selectedSensor.pose,
+                              position: { ...selectedSensor.pose.position, z: Number(event.target.value) }
+                            }
+                          })
+                        }
+                      />
+                    </label>
+                    <label>
+                      Yaw
+                      <input
+                        type="number"
+                        step={1}
+                        value={selectedSensor.pose.orientation.yawDeg}
+                        onChange={(event) =>
+                          handleSensorUpdate({
+                            ...selectedSensor,
+                            pose: {
+                              ...selectedSensor.pose,
+                              orientation: {
+                                ...selectedSensor.pose.orientation,
+                                yawDeg: Number(event.target.value)
+                              }
+                            }
+                          })
+                        }
+                      />
+                    </label>
+                    <label>
+                      Pitch
+                      <input
+                        type="number"
+                        step={1}
+                        value={selectedSensor.pose.orientation.pitchDeg}
+                        onChange={(event) =>
+                          handleSensorUpdate({
+                            ...selectedSensor,
+                            pose: {
+                              ...selectedSensor.pose,
+                              orientation: {
+                                ...selectedSensor.pose.orientation,
+                                pitchDeg: Number(event.target.value)
+                              }
+                            }
+                          })
+                        }
+                      />
+                    </label>
+                    <label>
+                      Roll
+                      <input
+                        type="number"
+                        step={1}
+                        value={selectedSensor.pose.orientation.rollDeg}
+                        onChange={(event) =>
+                          handleSensorUpdate({
+                            ...selectedSensor,
+                            pose: {
+                              ...selectedSensor.pose,
+                              orientation: {
+                                ...selectedSensor.pose.orientation,
+                                rollDeg: Number(event.target.value)
+                              }
+                            }
+                          })
+                        }
+                      />
+                    </label>
+                  </div>
+                )}
+                {inspectorTab === "fov" && (
+                  <div className="inspector-grid">
+                    <label>
+                      HFOV
+                      <input
+                        type="number"
+                        step={1}
+                        value={selectedSensor.fov.horizontalDeg}
+                        onChange={(event) =>
+                          handleSensorUpdate({
+                            ...selectedSensor,
+                            fov: { ...selectedSensor.fov, horizontalDeg: Number(event.target.value) }
+                          })
+                        }
+                      />
+                    </label>
+                    <label>
+                      VFOV
+                      <input
+                        type="number"
+                        step={1}
+                        value={selectedSensor.fov.verticalDeg ?? ""}
+                        onChange={(event) =>
+                          handleSensorUpdate({
+                            ...selectedSensor,
+                            fov: {
+                              ...selectedSensor.fov,
+                              verticalDeg: event.target.value === "" ? null : Number(event.target.value)
+                            }
+                          })
+                        }
+                      />
+                    </label>
+                    <label>
+                      Range (m)
+                      <input
+                        type="number"
+                        step={5}
+                        value={selectedSensor.rangeM}
+                        onChange={(event) =>
+                          handleSensorUpdate({ ...selectedSensor, rangeM: Number(event.target.value) })
+                        }
+                      />
+                    </label>
+                  </div>
+                )}
+                {inspectorTab === "advanced" && (
+                  <div className="inspector-advanced">
+                    <div>
+                      <span>Spec Category</span>
+                      <strong>{selectedSensor.specCategory}</strong>
+                    </div>
+                    <div>
+                      <span>Mirror Group</span>
+                      <strong>{selectedSensor.mirrorGroup ?? "None"}</strong>
+                    </div>
+                    <div>
+                      <span>Vendor Profile</span>
+                      <strong>{state.vendors[selectedSensor.type]}</strong>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="inspector">
@@ -736,9 +838,9 @@ export const App = () => {
                 <p>Select a sensor to edit.</p>
               </div>
             )}
-          </div>
-          <div className="panel-section">
-            <h3>Preset Utilities</h3>
+          </details>
+          <details open={!isCompact}>
+            <summary>Preset Utilities</summary>
             <button
               disabled={!state.meta.presetId}
               onClick={() => {
@@ -760,7 +862,7 @@ export const App = () => {
             >
               Reset to Tesla FSD
             </button>
-          </div>
+          </details>
         </aside>
       </div>
     </div>

@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import * as THREE from "three";
 import { Sensor } from "../../models/types";
 import { generateLidarPoints } from "../../engine/lidar";
+import { SENSOR_TYPE_COLORS } from "../../theme/sensorColors";
 
 export const LidarPointCloud = ({ sensor, pointCount }: { sensor: Sensor; pointCount: number }) => {
   const geometry = useMemo(() => {
@@ -13,7 +14,7 @@ export const LidarPointCloud = ({ sensor, pointCount }: { sensor: Sensor; pointC
 
   return (
     <points geometry={geometry}>
-      <pointsMaterial size={0.05} color="#22d3ee" transparent opacity={0.6} />
+      <pointsMaterial size={0.05} color={SENSOR_TYPE_COLORS.lidar} transparent opacity={0.6} />
     </points>
   );
 };

@@ -1,12 +1,14 @@
 import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
-import { useEffect, useMemo, useState } from "react";
+import { OrbitControls as OrbitControlsImpl } from "three-stdlib";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { applySideViewDrag, applyTopViewDrag } from "../engine/viewEditing";
 import { CoverageResult } from "../engine/coverage";
 import { Layers, ScenarioState, Sensor, VehicleTemplate } from "../models/types";
 import { CoverageHeatmap } from "./three/CoverageHeatmap";
 import { ReferenceGuides } from "./three/ReferenceGuides";
 import { SceneObjects } from "./three/SceneObjects";
+import { getMainCameraPose } from "../engine/camera";
 
 export type SceneViewMode = "main" | "top" | "side";
 
@@ -22,15 +24,28 @@ type SceneViewProps = {
   lidarPointCount: number;
   showLidarPoints: boolean;
   coverage?: CoverageResult;
+  resetKey?: number;
   onSelect: (id: string | null) => void;
   onUpdateSensor: (sensor: Sensor) => void;
+  children?: ReactNode;
 };
 
 const ViewLabel = ({ text }: { text: string }) => <div className="view-label">{text}</div>;
 
-const CameraRig = ({ mode }: { mode: SceneViewMode }) => {
-  const isMain = mode === "main";
-  return isMain ? <OrbitControls enablePan enableRotate enableZoom /> : null;
+const MainCameraControls = ({ pose, resetKey }: { pose: ReturnType<typeof getMainCameraPose>; resetKey: number }) => {
+  const { camera } = useThree();
+  const controlsRef = useRef<OrbitControlsImpl | null>(null);
+
+  useEffect(() => {
+    camera.position.set(...pose.position);
+    camera.lookAt(...pose.target);
+    if (controlsRef.current) {
+      controlsRef.current.target.set(...pose.target);
+      controlsRef.current.update();
+    }
+  }, [camera, pose, resetKey]);
+
+  return <OrbitControls ref={controlsRef} enablePan enableRotate enableZoom />;
 };
 
 const InvalidateOnChange = ({ deps }: { deps: unknown[] }) => {
@@ -53,14 +68,17 @@ export const SceneView = ({
   lidarPointCount,
   showLidarPoints,
   coverage,
+  resetKey = 0,
   onSelect,
-  onUpdateSensor
+  onUpdateSensor,
+  children
 }: SceneViewProps) => {
   const isMain = mode === "main";
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const isEditableView = enableEdit && !isMain;
+  const mainCamera = useMemo(() => getMainCameraPose(vehicle), [vehicle]);
   const cameraProps = isMain
-    ? { position: [4.5, -4.2, 3], fov: 45, near: 0.1, far: 200 }
+    ? { position: mainCamera.position, fov: mainCamera.fov, near: mainCamera.near, far: mainCamera.far }
     : mode === "top"
     ? { position: [0, 0, 10], zoom: 60, near: 0.1, far: 200 }
     : { position: [0, 10, 0], zoom: 60, near: 0.1, far: 200 };
@@ -163,12 +181,13 @@ export const SceneView = ({
             <meshBasicMaterial transparent opacity={0} />
           </mesh>
         )}
-        <CameraRig mode={mode} />
+        {isMain && <MainCameraControls pose={mainCamera} resetKey={resetKey} />}
         {frameloop === "demand" && (
           <InvalidateOnChange deps={[sensors, layers, scenarios, coveragePoints, showLidarPoints, lidarPointCount]} />
         )}
       </Canvas>
       <ViewLabel text={label} />
+      {children}
     </div>
   );
 };
