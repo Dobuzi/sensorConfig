@@ -4,6 +4,14 @@ import { VehicleTemplate } from "../../models/types";
 
 type DetailLevel = "low" | "high";
 
+const alignToGround = (geometry: THREE.BufferGeometry) => {
+  geometry.computeBoundingBox();
+  if (!geometry.boundingBox) return geometry;
+  const minZ = geometry.boundingBox.min.z;
+  geometry.translate(0, 0, -minZ);
+  return geometry;
+};
+
 const buildBodyGeometry = (length: number, width: number, height: number) => {
   const halfL = length * 0.5;
   const profile = new THREE.Shape();
@@ -22,8 +30,9 @@ const buildBodyGeometry = (length: number, width: number, height: number) => {
     bevelSize: 0.06,
     bevelSegments: 2
   });
+  body.rotateX(Math.PI / 2);
   body.center();
-  return body;
+  return alignToGround(body);
 };
 
 const buildRoofGeometry = (length: number, width: number, height: number) => {
@@ -41,8 +50,9 @@ const buildRoofGeometry = (length: number, width: number, height: number) => {
     bevelSize: 0.03,
     bevelSegments: 1
   });
+  geometry.rotateX(Math.PI / 2);
   geometry.center();
-  return geometry;
+  return alignToGround(geometry);
 };
 
 const useVehicleMeshes = (vehicle: VehicleTemplate, detail: DetailLevel) => {
@@ -53,6 +63,7 @@ const useVehicleMeshes = (vehicle: VehicleTemplate, detail: DetailLevel) => {
     const roof = detail === "high" ? buildRoofGeometry(length, width, height * 0.35) : null;
     const wheelRadius = vehicle.type === "suv" ? 0.33 : 0.3;
     const wheelThickness = 0.18;
+    const wheelbase = vehicle.dimensions.wheelbase;
 
     return {
       body,
@@ -61,7 +72,8 @@ const useVehicleMeshes = (vehicle: VehicleTemplate, detail: DetailLevel) => {
       wheelRadius,
       wheelThickness,
       width,
-      length
+      length,
+      wheelbase
     };
   }, [vehicle, detail]);
 };
@@ -75,16 +87,16 @@ export const VehicleModel3D = ({
 }) => {
   // Parametric Tesla-inspired low-poly form; extra trim disabled in low detail for performance.
   const meshes = useVehicleMeshes(vehicle, detailLevel);
-  const wheelX = meshes.length * 0.28;
-  const wheelZ = meshes.wheelRadius * 0.9;
-  const wheelY = meshes.width * 0.46;
+  const wheelX = meshes.wheelbase * 0.5;
+  const wheelZ = meshes.wheelRadius;
+  const wheelY = Math.min(meshes.width * 0.46, meshes.width / 2 - 0.12);
   const mirrorX = meshes.length * 0.1;
   const mirrorY = meshes.width * 0.52;
   const roofZ = meshes.height * 0.55;
 
   return (
     <group raycast={() => null}>
-      <mesh geometry={meshes.body} position={[0, 0, meshes.height * 0.15]}>
+      <mesh geometry={meshes.body} position={[0, 0, 0]}>
         <meshStandardMaterial color="#e2e8f0" roughness={0.4} metalness={0.1} />
       </mesh>
       {meshes.roof && (

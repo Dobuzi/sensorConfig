@@ -24,6 +24,7 @@ type SceneViewProps = {
   lidarPointCount: number;
   showLidarPoints: boolean;
   vehicleDetail: "low" | "high";
+  guideDetail: "low" | "high";
   coverage?: CoverageResult;
   resetKey?: number;
   onSelect: (id: string | null) => void;
@@ -69,6 +70,7 @@ export const SceneView = ({
   lidarPointCount,
   showLidarPoints,
   vehicleDetail,
+  guideDetail,
   coverage,
   resetKey = 0,
   onSelect,
@@ -148,7 +150,7 @@ export const SceneView = ({
       >
         <ambientLight intensity={0.6} />
         <directionalLight position={[5, -3, 6]} intensity={0.8} />
-        {!isMain && <ReferenceGuides plane={mode === "top" ? "xy" : "xz"} />}
+        {!isMain && <ReferenceGuides plane={mode === "top" ? "xy" : "xz"} detail={guideDetail} />}
         {mode === "top" && coverage && coveragePoints.length > 0 && (
           <CoverageHeatmap points={coveragePoints} />
         )}

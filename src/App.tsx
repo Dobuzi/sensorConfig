@@ -131,6 +131,7 @@ export const App = () => {
   const isPhone = layout === "phone";
   const isTablet = layout === "tablet";
   const isDesktop = layout === "desktop";
+  const guideDetail = state.settings.performanceMode || isPhone ? "low" : "high";
   const appClass = `app ${isCompact ? "compact" : ""} ${isTouch ? "touch" : ""}`;
 
   const sceneOverlay = (mode: SceneViewMode) => (
@@ -877,6 +878,7 @@ export const App = () => {
               lidarPointCount={effectiveLidarPoints}
               showLidarPoints={state.layers.lidar}
               vehicleDetail={state.settings.vehicleDetail}
+              guideDetail={guideDetail}
               resetKey={resetViewToken}
               onSelect={(id) => dispatch({ type: "selectSensor", id })}
               onUpdateSensor={handleSensorUpdate}
@@ -905,6 +907,7 @@ export const App = () => {
                 lidarPointCount={effectiveLidarPoints}
                 showLidarPoints={state.layers.lidar}
                 vehicleDetail={state.settings.vehicleDetail}
+                guideDetail={guideDetail}
                 coverage={state.settings.showCoverageHeatmap ? coverage : undefined}
                 onSelect={(id) => dispatch({ type: "selectSensor", id })}
                 onUpdateSensor={handleSensorUpdate}
@@ -921,6 +924,7 @@ export const App = () => {
                 lidarPointCount={effectiveLidarPoints}
                 showLidarPoints={state.layers.lidar}
                 vehicleDetail={state.settings.vehicleDetail}
+                guideDetail={guideDetail}
                 onSelect={(id) => dispatch({ type: "selectSensor", id })}
                 onUpdateSensor={handleSensorUpdate}
               />
@@ -963,6 +967,7 @@ export const App = () => {
               lidarPointCount={effectiveLidarPoints}
               showLidarPoints={state.layers.lidar}
               vehicleDetail={state.settings.vehicleDetail}
+              guideDetail={guideDetail}
               resetKey={resetViewToken}
               onSelect={(id) => dispatch({ type: "selectSensor", id })}
               onUpdateSensor={handleSensorUpdate}
@@ -982,6 +987,7 @@ export const App = () => {
                 lidarPointCount={effectiveLidarPoints}
                 showLidarPoints={state.layers.lidar}
                 vehicleDetail={state.settings.vehicleDetail}
+                guideDetail={guideDetail}
                 coverage={state.settings.showCoverageHeatmap ? coverage : undefined}
                 onSelect={(id) => dispatch({ type: "selectSensor", id })}
                 onUpdateSensor={handleSensorUpdate}
@@ -998,6 +1004,7 @@ export const App = () => {
                 lidarPointCount={effectiveLidarPoints}
                 showLidarPoints={state.layers.lidar}
                 vehicleDetail={state.settings.vehicleDetail}
+                guideDetail={guideDetail}
                 onSelect={(id) => dispatch({ type: "selectSensor", id })}
                 onUpdateSensor={handleSensorUpdate}
               />
@@ -1044,6 +1051,7 @@ export const App = () => {
                     lidarPointCount={effectiveLidarPoints}
                     showLidarPoints={state.layers.lidar}
                     vehicleDetail={state.settings.vehicleDetail}
+                    guideDetail={guideDetail}
                     coverage={mode === "top" && state.settings.showCoverageHeatmap ? coverage : undefined}
                     resetKey={mode === "main" ? resetViewToken : undefined}
                     onSelect={(id) => dispatch({ type: "selectSensor", id })}

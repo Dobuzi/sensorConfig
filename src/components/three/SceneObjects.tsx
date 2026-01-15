@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import * as THREE from "three";
 import { Layers, ScenarioState, Sensor, VehicleTemplate } from "../../models/types";
 import { detectOverlaps } from "../../engine/overlap";
-import { useFrustumGeometry } from "./Frustum";
+import { buildFovGeometry } from "./FovGeometry";
 import { VehicleModel3D } from "./VehicleModel3D";
 import { LidarPointCloud } from "./LidarPointCloud";
 import { ScenarioOverlays } from "./ScenarioOverlays";
@@ -39,7 +39,7 @@ const SensorMesh = ({
     () => new THREE.MeshStandardMaterial({ color: SENSOR_TYPE_COLORS[sensor.type] }),
     [sensor.type]
   );
-  const frustum = useFrustumGeometry(sensor.fov.horizontalDeg, sensor.fov.verticalDeg, sensor.rangeM);
+  const frustum = useMemo(() => buildFovGeometry(sensor), [sensor]);
   const frustumMaterial = useMemo(
     () => new THREE.MeshStandardMaterial({
       color: SENSOR_TYPE_COLORS[sensor.type],

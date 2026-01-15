@@ -105,3 +105,9 @@ All values are based on publicly discussed vendor families or datasheet referenc
   - Source: https://innoviz.tech/
   - Accessed: 2026-01-15
   - Note: Public references; approximated.
+
+## Visualization Assumptions
+- Camera FOVs render as frustums; wide cameras trade range for field coverage.
+- Radar FOVs render as fan-shaped sectors (not camera cones).
+- Ultrasonic FOVs render as short, wide cones.
+- LiDAR point clouds respect the registry range cutoff.
